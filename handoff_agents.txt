@@ -1,0 +1,57 @@
+// basic handoff: agent -> agent
+A → B
+function AgentA(state):
+    print("Agent A running")
+
+    next_agent = "B"         # handoff
+    state["msg"] = "from A"  # update state
+
+    return Command(
+        goto = next_agent,
+        update = state
+    )
+
+function AgentB(state):
+    print("Agent B got:", state["msg"])
+    # finish the workflow
+
+
+// looping agent
+A → A → A → END
+function AgentA(state):
+    if state["counter"] < 3:
+        state["counter"] += 1
+        return Command(
+            goto = "A",      # run myself again
+            update = state
+        )
+    else:
+        return Command(
+            goto = "END",
+            update = state
+        )
+
+// subgraph
+Inside-Alice → (jump out) → Bob
+function AliceInternalNode(state):
+    return Command(
+        goto = "bob",          # go to BOB in parent graph
+        update = state,
+        graph = PARENT         # IMPORTANT: go OUT of Alice
+    )
+
+
+// tools
+tool transfer_to_bob():
+    return Command(
+        goto = "bob",
+        update = {"info": "sent via tool"},
+        graph = PARENT
+    )
+
+// llm
+function AgentA(state):
+    if "transfer" tool was called:
+        return CommandFromTool
+    else:
+        return normal output
