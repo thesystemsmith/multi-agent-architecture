@@ -171,7 +171,7 @@ def test_supervisor_functionality():
                     }
                 ]
             },
-            subgraphs=False,
+            subgraphs=False, #see subgraph = True
             config=RunnableConfig(),  # optional, but explicit
         ):
             pretty_print_messages(chunk, last_message=True)
